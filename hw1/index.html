@@ -1,7 +1,230 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 1 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184/284A Rasterizer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Homework 1: Rasterizer</h1>
+<h2 align="middle">Harkeerat Singh</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>
+    In this project, I developed a rasterization-based renderer capable of drawing 2D shapes, performing transformations, and applying texture mapping with advanced techniques such as mipmapping and various sampling strategies. The renderer supports basic geometric primitives and can handle complex scenes with textured objects. I implemented supersampling for anti-aliasing, enabling smoother edges and higher-quality rendering. The exploration into texture mapping extended to nearest neighbor and bilinear interpolation methods, enhancing the visual quality of textures, especially when viewed at oblique angles or from a distance. Additionally, the introduction of mipmapping and the implementation of level sampling methods (nearest, linear) significantly improved performance and reduced aliasing artifacts. This project deepened my understanding of computer graphics' foundational concepts, particularly how mathematical principles translate into visual representations and the importance of optimization in rendering algorithms. It was a comprehensive exercise in applying theoretical knowledge to practical, visually oriented problems, offering insights into the challenges and intricacies of building a renderer from the ground up.
+</p>
+
+<h2 align="middle">Section I: Rasterization</h2>
+
+<h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+
+<p>
+   Here, we implemented triangle rasterization by first determining the bounding box that encloses the triangle. This step ensures we only consider pixels that might lie within the triangle, optimizing our algorithm's efficiency by avoiding unnecessary checks outside this area.
+
+    Using barycentric coordinates, the algorithm then checks each pixel within this bounding box to ascertain whether it falls inside the triangle. If a pixel is determined to be inside, it is colored; otherwise, it's left untouched. This method is efficient because it directly targets potentially relevant pixels, leveraging geometric properties to minimize the computational load. Compared to an approach that checks every sample within the bounding box, this method is no worse in terms of efficiency and can significantly reduce processing time by focusing on a smaller subset of pixels that are actually within the triangle's boundaries.
+</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="Task_1a.png" align="middle" width="400px"/>
+        <figcaption align="middle">Default Viewing Parameters</figcaption>
+      </td>
+      <td>
+        <img src="Task_1b.png" align="middle" width="400px"/>
+        <figcaption align="middle">Pixel Inspector</figcaption>
+      </td>
+    </tr>
+    <br>
+  </table>
+</div>
+
+
+<h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+<p>
+    Supersampling enhances image quality by rendering scenes at a higher resolution and then averaging the results down to the target resolution, effectively smoothing out jagged edges (aliasing). In our project, we adapted the rasterization pipeline to support supersampling by:
+
+    Creating a sample buffer that's larger than the standard framebuffer, with its size based on the supersampling rate squared. For example, a 4x supersampling rate means each pixel is represented by 16 samples in the sample buffer.
+    During rasterization, we calculate and store colors for each sample within a pixel, capturing finer details.
+    After rasterization, we average the colors of these samples for each pixel, which softens edges and reduces aliasing.
+    This method requires more computation and memory but significantly improves visual quality by providing smoother transitions and reducing jagged edges in the rendered image.
+</p>
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="Task_2a.png" align="middle" width="400px" />
+                <figcaption align="middle">1 Per Pixel</figcaption>
+            </td>
+            <td>
+                <img src="Task_2b.png" align="middle" width="400px" />
+                <figcaption align="middle">4 Per Pixel</figcaption>
+            </td>
+            <td>
+                <img src="Task_2c.png" align="middle" width="400px" />
+                <figcaption align="middle">16 Per Pixel</figcaption>
+            </td>
+        </tr>
+        <br />
+    </table>
+</div>
+
+<p>
+    When examining the skinny red triangle corner at different supersampling rates (1, 4, and 16), we observe a clear improvement in the quality of the triangle's edges. At a supersampling rate of 1, the triangle's edges appear jagged and pixelated due to aliasing, which is the visual staircasing effect that occurs when high-frequency detail (like a thin triangle edge) is sampled at a lower resolution than is necessary to capture the detail accurately.
+
+    As the supersampling rate increases to 4, each pixel is effectively represented by 16 sub-pixels. This increase allows for a finer sampling of the triangle edge within each pixel area, leading to a smoother transition between the triangle's edge and the background. The jagged edges start to soften as more samples contribute to the final color of each pixel, blending the edge more smoothly with its surroundings.
+
+    At the highest examined rate of 16, each pixel is represented by 256 sub-pixels, significantly increasing the detail level within each pixel. This high rate of supersampling provides a very detailed approximation of the triangle's edge, greatly reducing the visibility of aliasing. The edge of the skinny red triangle appears much smoother and more naturally integrated with the background. 
+</p>
+
+<h3 align="middle">Part 3: Transforms</h3>
+
+
+
+<h2 align="middle">Section II: Sampling</h2>
+
+
+<p>
+    In Task 3, we focused on implementing SVG transformations for the cubeman in svg/transforms/robot.svg. Our approach involved manipulating the arm of the cubeman to simulate a waving gesture. To achieve this, we utilized a rotation transformation on the arm, rotating it by -30 degrees to give the impression that the cubeman is waving. This rotation was applied alongside a translation to position the arm correctly relative to the cubeman's body. Additionally, we changed the arm's color to yellow, contrasting with the rest of the body to highlight the waving motion. These transformations were specified directly in the SVG file, showcasing how SVG transformations can be used to modify graphic elements' appearance and position without altering their original definitions significantly.
+</p>
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="Task_3.png" align="middle" width="400px" />
+                <figcaption align="middle">Cubeman</figcaption>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<h3 align="middle">Part 4: Barycentric coordinates</h3>
+
+<p>
+    Barycentric coordinates were crucial for interpolating vertex attributes like color across triangles. Imagine a triangle where each vertex is assigned a distinct color: red, green, and blue. Barycentric coordinates allow us to determine a point's color inside the triangle by blending these colors based on the point's position relative to the vertices. This method is efficient for rendering smoothly shaded surfaces or textures, as it avoids checking every sample within the triangle's bounding box. Instead, it directly computes the color for each pixel, ensuring a smooth gradient and an optimal blend of colors at every point inside the triangle.
+</p>
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="Task_4.png" align="middle" width="400px" />
+                <figcaption align="middle">Color Wheel</figcaption>
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+<h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="Task5a.png" align="middle" width="400px" />
+                <figcaption align="middle">Nearest Pixel Sampling, 1 Per Pixel</figcaption>
+            </td>
+            <td>
+                <img src="Task_5b.png" align="middle" width="400px" />
+                <figcaption align="middle">Nearest Pixel Sampling, 16 Per Pixel</figcaption>
+            </td>
+            <td>
+                <img src="Task_5c.png" align="middle" width="400px" />
+                <figcaption align="middle">Bilinear Interpolation, 1 Per Pixel</figcaption>
+            </td>
+            <td>
+                <img src="Task_5d.png" align="middle" width="400px" />
+                <figcaption align="middle">Bilinear Interpolation, 1 Per Pixel</figcaption>
+            </td>
+        </tr>
+        <br />
+    </table>
+</div>
+
+<p>
+    Nearest Sampling at 1 sample per pixel: Here we see the most aliasing, with jagged edges and blocky texture details due to the use ofe color of the nearest texel without any blending.
+
+    Nearest Sampling at 16 samples per pixel: Improvement from the first image are somewhat noticeable here from the increased sample rate, which helps reduce aliasing and provides a smoother look. However, it still appears somewhat blocky compared to bilinear sampling due to the lack of blending between texels.
+
+    Bilinear Sampling at 1 sample per pixel: Here, bilinear sampling's blending of the four nearest texels should result in a smoother image with less noticeable aliasing than nearest sampling.
+
+    Bilinear Sampling at 16 samples per pixel: This image should look the smoothest out of all, as it combines the benefits of bilinear sampling with the additional smoothness that comes from supersampling,
+</p>
+
+<h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+
+<p>
+    Level sampling refers to the technique of choosing the appropriate level of detail (LOD) in a texture's mipmap chain to use for texture mapping, which helps to avoid artifacts like moiré patterns. The chosen LOD typically depends on the angle and distance from which a surface is viewed.
+    We can describe the trade-offs between speed, memory usage, and antialiasing quality as such:
+
+    Using the base level texture (no mipmapping) is the fastest since it doesn't need to calculate the appropriate LOD. However, using mipmaps can still be quite efficient because lower LOD levels are smaller and thus quicker to sample from.
+
+    Mipmapping increases memory usage since it requires storing multiple versions of the texture at different resolutions. However, because the higher levels are significantly smaller, the total added memory is less than the size of the original texture.
+
+    Nearest sampling is fast but can result in pixelated images. Bilinear sampling, which interpolates between the four closest texels, provides a smoother result but is slower. Mipmapping, which uses level sampling, provides a method for antialiasing textures that are minified as it can choose a level that avoids sampling high-frequency detail that cannot be properly represented at the current resolution.
+</p>
+
+<div align="middle">
+    <table style="width=100%">
+        <tr>
+            <td>
+                <img src="Task_6a.png" align="middle" width="400px" />
+                <figcaption align="middle">Level Zero + Nearest Pixel Sampling</figcaption>
+            </td>
+            <td>
+                <img src="Task_6b.png" align="middle" width="400px" />
+                <figcaption align="middle">Level Zero + Bilinear Interpolation</figcaption>
+            </td>
+            <td>
+                <img src="Task_6c.png" align="middle" width="400px" />
+                <figcaption align="middle">Level Nearest + Nearest Pixel Sampling</figcaption>
+            </td>
+            <td>
+                <img src="Task_6d.png" align="middle" width="400px" />
+                <figcaption align="middle">Level Nearest + Bilinear Interpolation</figcaption>
+            </td>
+        </tr>
+        <br />
+    </table>
+</div>
+
+<p>
+    Unfortunately, the pixtures struggle to register the exact differences between each condition, cluing to a potential issue with the implementation. However, we can still generalize the differences between these 4 conditions as such:
+    Level Zero, Nearest Pixel Sampling: This method uses the highest resolution texture (zero-th MipLevel) and selects the nearest texel color. At a supersample rate of 16 per pixel, the aliasing is reduced due to averaging in the supersampling process, but the texture can still appear blocky because there is no color interpolation between texels.
+
+    Level Zero, Bilinear Pixel Interpolation Sampling: With level zero, the highest resolution texture is used, but now with bilinear interpolation, which smooths out the transitions between texels. Even at a single sample per pixel, the result is much smoother compared to nearest pixel sampling because of the interpolation.
+
+    Nearest Level, Nearest Pixel Sampling: This technique selects the MipLevel closest to the required level of detail based on the size of the pixel in texture space. Using nearest pixel sampling means that, even at a supersample rate of 16, while some aliasing may be reduced, the lack of interpolation can still result in a relatively blocky texture.
+
+    Nearest Level, Bilinear Pixel Interpolation Sampling: This combines level sampling with bilinear pixel sampling. It chooses the closest MipLevel for the pixel size and applies bilinear interpolation. The result should be smoother than nearest pixel sampling, with a more natural gradient and reduced aliasing due to the combination of using an appropriate MipLevel and blending texel colors.
+</p>
+
+</body>
 </html>
