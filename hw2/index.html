@@ -1,7 +1,333 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 2 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    background-color: white;
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  kbd {
+    color: #121212;
+  }
+</style>
+<title>CS 184 Mesh Edit</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2018</h1>
+<h1 align="middle">Project 2: Mesh Edit</h1>
+<h2 align="middle">Harkeerat Singh</h2>
+
+<br><br>
+
+    <div>
+
+        <h2 align="middle">Overview</h2>
+        <p>
+            YOUR RESPONSE GOES HERE
+        </p>
+        <br />
+
+
+        <h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
+
+        <h3 align="middle">Part 1: Bezier Curves with 1D de Casteljau Subdivision</h3>
+
+
+        <p>
+            De Casteljau's algorithm evaluates Bezier curves by recursively interpolating between control points. For each recursion, it calculates intermediate points by linearly interpolating between each pair of consecutive control points using the parameter t. This process is repeated, reducing the number of points by one each time, until a single point remains, which lies on the Bezier curve for that t.
+
+            In the implementation within BezierCurve::evaluateStep, I applied one step of the algorithm. This function takes the current control points, performs linear interpolation between each consecutive pair using t, and outputs the next level of intermediate points. The function is intended to be called repeatedly until it reduces the control points to the single point that defines the curve at parameter t.
+        </p>
+        <br />
+
+
+
+        <p>
+        </p>
+        <!-- Example of including a single figure -->
+        <div align="middle">
+            <img src="images/part_1.png" align="middle" width="50%" />
+        </div>
+        <br />
+
+
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/part1_l0.png" align="middle" width="400px" />
+                        <figcaption>Level 0</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part1_l1.png" align="middle" width="400px" />
+                        <figcaption>Level 1</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="images/part1_l2.png" align="middle" width="400px" />
+                        <figcaption>Level 2</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part1_l3.png" align="middle" width="400px" />
+                        <figcaption>Level 3</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="images/part1_l4.png" align="middle" width="400px" />
+                        <figcaption>Level 4</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+
+        <div align="middle">
+            <img src="images/part1_b.png" align="middle" width="50%" />
+            <figcaption>Modified Bezier Curve</figcaption>
+        </div>
+        <br />
+        <br />
+        <h3 align="middle">Part 2: Bezier Surfaces with Separable 1D de Casteljau</h3>
+
+        <p>
+            The de Casteljau algorithm's extension to Bezier surfaces involves a two-step process, leveraging the algorithm's recursive nature. Initially, for a given
+            n×n grid of control points defining a Bezier surface, the algorithm treats each row of control points as defining a separate Bezier curve. By applying the de Casteljau algorithm along each of these curves with respect to a parameter
+
+            u, it collapses the grid to a set of
+
+            n points, each corresponding to a point on one of the
+
+            n Bezier curves. These resultant points can be thought of as defining a new, single Bezier curve in the perpendicular (v) direction.
+
+            In the implementation for Bezier surfaces, the process begins with applying evaluateStep or evaluate1D across each row (or column) based on the parameter
+
+            u, effectively reducing the 2D control point grid to a 1D array of points. These points are considered as a new set of control points for a Bezier curve in the
+
+            v direction. The algorithm is then applied again, now in the
+
+            v direction, to this array to find the final point on the Bezier surface for the given
+
+            u,v parameters. This methodology allows for the extension of Bezier curve evaluation techniques to surfaces, maintaining the geometric intuition of the de Casteljau algorithm.
+        </p>
+        <br />
+
+
+
+        <div align="middle">
+            <img src="images/part2.png" align="middle" width="50%" />
+        </div>
+        <br />
+        <br />
+
+
+        <h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+
+        <h3 align="middle">Part 3: Area-Weighted Vertex Normals</h3>
+
+
+        <p>
+            The computation of area-weighted vertex normals is performed through an iterative process. This process involves traversing each face connected to the vertex in question and computing the face normal. Each computed face normal is then scaled by the area of the corresponding face, ensuring that larger faces have a more significant impact on the final normal calculation—a necessary consideration given that larger faces affect the surface curvature more prominently.
+
+            After accumulating the area-weighted normals, we sum these vectors to produce a preliminary vertex normal. To ensure this vector is purely directional without any influence from the face areas, we normalize it, thus arriving at the final area-weighted vertex normal.
+        </p>
+        <br />
+
+
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/part3_a.png" align="middle" width="400px" />
+                        <figcaption>Default Shading</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part3_b.png" align="middle" width="400px" />
+                        <figcaption>Phong Shading</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <br />
+
+
+        <h3 align="middle">Part 4: Edge Flip</h3>
+
+        <p>
+            To implement the edge flip operation, I focused on updating the pointers within the half-edge data structure to ensure the new connectivity matched the desired configuration after an edge flip. This process involved identifying the half-edges, vertices, and faces around the edge to be flipped and then reassigning their pointers to reflect the new adjacency relationships. The main steps were:
+
+            Ensuring the edge wasn't on a boundary to avoid invalid operations.
+            Swapping the 'next', 'twin', and 'vertex' pointers of the half-edges directly involved in the flip, along with updating the 'face' pointers to link to the correct faces post-flip.
+            During debugging, visual checks of the mesh and utilizing the provided check_for(...) function helped identify incorrect pointer assignments. This approach allowed for quick identification and correction of issues, ensuring the flip operation's correctness without introducing errors into the mesh structure.
+        </p>
+        <br />
+
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/part4_a.png" align="middle" width="400px" />
+                        <figcaption>Before Edge Flip</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part4_b.png" align="middle" width="400px" />
+                        <figcaption>After Edge Flip</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <br />
+        <br />
+
+
+
+
+
+        <h3 align="middle">Part 5: Edge Split</h3>
+        <p>
+
+            The edge split operation was implemented by first checking if the edge is a boundary edge and, if not, proceeding to dynamically create new elements (halfedges, a vertex, edges, and faces) necessary for the split. The positions of the existing and new elements were then updated, ensuring the mesh accurately reflected the new topology. Key steps included reassigning neighbor pointers for halfedges and updating references for vertices, edges, and faces to incorporate the new vertex placed at the midpoint of the split edge. This operation expanded the mesh while maintaining its structural integrity.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/part5_a.png" align="middle" width="400px" />
+                        <figcaption>No Changes</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part5_b.png" align="middle" width="400px" />
+                        <figcaption>After Edge Split</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part5_c.png" align="middle" width="400px" />
+                        <figcaption>After Edge Split + Flip</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <br />
+        <br />
+
+
+
+
+
+
+
+        <h3 align="middle">Part 6: Loop Subdivision for Mesh Upsampling</h3>
+        <b>
+        </b>
+        <p>
+
+            The Loop subdivision implementation involved a multi-step process to refine the mesh geometry. Initially, vertex positions were recalculated using the Loop subdivision rule, which combines the positions of neighboring vertices with the original vertex positions to smooth the mesh. This was followed by computing new positions for edge midpoints, effectively determining where new vertices would be placed upon edge splitting.
+
+            In the subsequent step, each edge in the mesh was split, introducing new vertices at the calculated midpoints. Special attention was given to properly flagging newly created edges and vertices to differentiate between those originating from the initial mesh and those generated by the subdivision. This distinction was crucial for the next phase, where specific edges connecting new and old vertices were flipped to improve the mesh's topology and ensure a more uniform distribution of vertices.
+
+            The final step involved updating the positions of all vertices, both old and newly created, to their new positions as determined by the subdivision process. Throughout the implementation, debugging focused on ensuring that vertex and edge updates adhered to the Loop subdivision specifications, with particular emphasis on maintaining the mesh's integrity and preventing the introduction of errors such as incorrect vertex connections or misplaced edges.
+        </p>
+        <br />
+
+
+
+        As a result of loop subdivision, we see the rounding off of sharp corners and edges, subsequently smoothening the mesh. This effect however can result in the diminishing of the mesh's geometric details. Pre-splitting edges before subdivision can help preserve sharp features to an extent by adding more control points.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/Part6a.png" align="middle" width="400px" />
+                        <figcaption>No Changes to Edges</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/Part6b.png" align="middle" width="400px" />
+                        <figcaption>Level 1 Subdivision</figcaption>
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="images/Part6c.png" align="middle" width="400px" />
+                        <figcaption>Pre-Edge Split</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/Part6d.png" align="middle" width="400px" />
+                        <figcaption>Level 1 Subdivision</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/Part6e.png" align="middle" width="400px" />
+
+                    </td>
+                    <td>
+                        <img src="images/Part6f.png" align="middle" width="400px" />
+
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/Part6g.png" align="middle" width="400px" />
+                        <figcaption>Pre-Edge Split</figcaption>
+                    </td>
+                    </td>
+                </tr>
+                <br />
+            </table>
+        </div>
+        <br />
+
+        <p>
+
+            The screenshots demonstrate that loop subdivision tends to smooth out the mesh, affecting sharp corners and edges. Without pre-splitting edges, the first level of upsampling already introduces noticeable changes to the mesh geometry. However, pre-splitting edges before subdivision helps in preserving the original mesh geometry more effectively after the first upsampling. The effectiveness of this approach can vary based on which edges are pre-split and the number of upsampling levels applied.
+        </p>
+
+
+
+
+
+
+    </div></body>
 </html>
