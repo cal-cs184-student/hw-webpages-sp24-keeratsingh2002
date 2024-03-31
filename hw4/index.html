@@ -1,7 +1,472 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 4 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <style>
+    body {
+      background-color: #404040;
+      background-color: white;
+      padding: 100px;
+      width: 1000px;
+      margin: auto;
+      text-align: left;
+      font-weight: 300;
+      font-family: 'Open Sans', sans-serif;
+      color: #121212;
+      /* cursor: url(https://rsha256.github.io/teapot-clear32.png), default!important;
+      cursor: url(https://rsha256.github.io/teapot-clear32.png), pointer!important; */
+      cursor: url(https://rsha256.github.io/dragon-clear32.png), default!important;
+      cursor: url(https://rsha256.github.io/dragon-clear32.png), pointer!important;
+      /* cursor: url(https://rsha256.github.io/cloth-clear-32.png), default!important;
+      cursor: url(https://rsha256.github.io/cloth-clear-32.png), pointer!important; */
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+    kbd {
+      color: #121212;
+    }
+    blockquote {
+      color: #888;
+      border: 2px solid #333;
+      padding: 10px;
+      background-color: #ccc;
+    }
+
+    table.custom-tbl {
+      border: 1px solid;
+    }
+
+    table.custom-tbl th {
+      border: 1px solid;
+      background-color: rgb(99, 209, 209);
+    }
+
+    table.custom-tbl td {
+      border: 1px solid;
+      background-color: #f1e686a8;
+    }
+  </style>
+
+  <title>CS 184 Mesh Editor</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <!-- Not using below due to lacking bold fontfaces -->
+  <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro|Source+Sans+Pro:400,700" rel="stylesheet"> -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto+Slab|Roboto:300,400,500,700" rel="stylesheet" />
+
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+  </script>  
+</head>
+
+<body>
+
+    <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2024</h1>
+    <h1 align="middle">Project 4: Cloth Simulator</h1>
+    <h2 align="middle">Harkeerat Singh</h2>
+
+    <br /><br />
+
+    <div>
+        <h2 align="middle">Overview</h2>
+        <p>
+            Throughout this project, I delved into the intricacies of shader programming, creating lifelike textures and lighting effects on 3D objects. I learned to utilize vertex and fragment shaders to simulate complex surface details, such as bumps and displacements, which significantly enhanced visual output without burdening the model with extra polygons. The fine-tuning of light interaction with materials using techniques like Blinn-Phong shading was particularly illuminating. The project highlighted the power of shaders in rendering realistic scenes and underscored their importance in graphics programming.  Throughout the process, I was fascinated to learn how shaders can efficiently simulate intricate details and how different mappings can impact performance and visual outcomes. This exploration provided me with a deeper understanding of the graphics pipeline and the powerful role shaders play in real-time rendering.
+        </p>
+    </div>
+
+    <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-1">
+        <h2 align="middle">Part 1: Masses and springs</h2>
+    </a>
+
+
+
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part1a.png" align="middle" width="500px" />
+                    <figcaption>No shearing constraints</figcaption>
+                </td>
+            </tr>
+            <tr align="center">
+                <td>
+                    <img src="images/part1b.png" align="middle" width="500px" />
+                    <figcaption>Only shearing constraints</figcaption>
+                </td>
+            </tr>
+            <tr align="center">
+                <td>
+                    <img src="images/part1c.png" align="middle" width="500px" />
+                    <figcaption>All constraints</figcaption>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+
+    <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-2">
+        <h2 align="middle">Part 2: Simulation via numerical integration</h2>
+    </a>
+
+    <p>
+
+        Adjusting the spring constant ks significantly influences the cloth's behavior in the simulation, 
+        reflecting changes in how stiff or flexible the cloth appears from start to rest.
+        </br>
+        </br>
+        With a Very Low ks:
+
+        </br>
+        A low spring constant means the springs connecting the point masses are less stiff. 
+        This lower stiffness allows the cloth to stretch and deform more easily under the influence of external forces such as gravity. 
+        From the start of the simulation, a cloth with a very low ks droops significantly, exhibiting pronounced stretching and bending.
+        As the simulation progresses towards rest, the cloth settles into a position where it appears more stretched out and less capable of 
+        retaining its original shape, compared to a cloth with a higher ks. The overall effect is a much more malleable and flexible cloth that responds more dramatically to forces and might take longer to reach a stable rest position due to the increased movement.
+        </br>
+        </br>
+        With a High ks:
+
+        </br>
+        Conversely, a high spring constant increases the springs' stiffness.
+        This increase means the cloth resists deformation, maintaining its shape more effectively against external forces.
+        From the simulation's start, a cloth with a high ks exhibits minimal sagging or stretching,
+        maintaining a shape closer to its initial configuration. As the simulation moves towards rest, 
+        the cloth with a high ks settles quickly, displaying minimal deformation from its original state. 
+        The cloth appears more rigid and less susceptible to stretching or bending,
+        reaching a stable rest position more swiftly and with less overall movement.
+    </p>
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part2a.png" align="middle" width="400vw" />
+                    <figcaption>KS = 5000</figcaption>
+                </td>
+                <td>
+                    <img src="images/part2b.png" align="middle" width="400vw" />
+                    <figcaption>KS = 50000</figcaption>
+                </td>
+                <td>
+                    <img src="images/part2c.png" align="middle" width="400vw" />
+                    <figcaption>KS = 50</figcaption>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+    <p>
+        Adjusting the cloth's density in a simulation changes its response to forces, akin to comparing lightweight versus heavyweight fabrics.
+        </br>
+        </br>
+        With a Low Density:
+        </br>
+        Behavior at Start: A low-density cloth, having less mass, reacts more to external forces right from the start. It moves freely and shows significant responses to gravity and any applied forces.
+        </br>
+        Behavior at Rest: Due to its lower mass, it exhibits more fluttering and takes a longer time to settle into a stable position. The cloth's movements are more pronounced and prolonged, resembling the behavior of lightweight fabrics like a thin curtain in a breeze.
+        </br>
+        </br>
+        With a High Density:
+        </br>
+        Behavior at Start: A high-density cloth, being heavier, shows less reaction to the same forces. Its movements are subdued, and it tends to maintain its initial shape more than a lighter cloth would.
+        </br>
+        Behavior at Rest: It reaches a rest position more quickly, with minimal fluttering and movement. This is similar to how a heavy drape falls straight down without much disturbance.
+    </p>
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part2a.png" align="middle" width="400vw" />
+                    <figcaption>KS = 5000</figcaption>
+                </td>
+                <td>
+                    <img src="images/part2d.png" align="middle" width="400vw" />
+                    <figcaption>KS = 5000</figcaption>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+    <p>
+
+        Adjusting the damping factor in a cloth simulation influences how quickly the cloth's movements settle down.
+        </br>
+        </br>
+        With Low Damping:
+        </br>
+        Behavior at Start: The cloth starts with more energetic movements. Low damping means the cloth's motion is less restricted, allowing it to oscillate or wave freely in response to forces.
+        </br>
+        Behavior at Rest: It takes longer for the cloth to come to rest. With less resistance to motion, the cloth continues to move and settle down slowly over time, showing prolonged oscillations and fluttering before it finally stabilizes.
+        </br>
+        </br>
+        With High Damping:
+        </br>
+        Behavior at Start: Movements of the cloth are more muted from the beginning. High damping restricts the cloth’s motion more, making it react in a subdued manner to any initial forces.
+        </br>
+        Behavior at Rest: The cloth settles into a rest position more quickly. The higher resistance to motion dampens oscillations and reduces fluttering, leading to a faster stabilization of the cloth after being disturbed.
+    </p>
+
+    </p>
+
+
+
+    <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-3">
+        <h2 align="middle">Part 3: Handling collisions with other objects</h2>
+    </a>
+
+
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part3a.png" align="middle" width="300vw" />
+                    <figcaption>$\text{ks} = 500$</figcaption>
+                </td>
+                <td>
+                    <img src="images/part3b.png" align="middle" width="300vw" />
+                    <figcaption>Initial configuration ($\text{ks} = 5,000$)</figcaption>
+                </td>
+                <td>
+                    <img src="images/part3c.png" align="middle" width="300vw" />
+                    <figcaption>$\text{ks} = 50,000$</figcaption>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+
+    <p>
+        With ks = 500 (Image 1)
+        </br>
+        The cloth with a lower ks value appears significantly more pliable and conformal to the sphere underneath. It sags and stretches considerably, almost hugging the sphere's surface closely, with deep folds and pronounced drooping between points of support. This is indicative of a softer, more elastic material that is less resistant to forces such as gravity.
+        </br>
+        </br>
+        With ks = 5000 (Image 2)
+        </br>
+        At the default spring constant, the cloth still shows a degree of flexibility and conforms to the shape of the sphere, but with less sagging and stretching compared to the lower ks value. The folds are less deep, and the cloth maintains a more defined shape, suggesting a firmer material that balances flexibility with structural integrity.
+        </br>
+        </br>
+        With ks = 50000 (Image 3)
+        </br>
+        With a much higher ks, the cloth exhibits very little sagging or stretching. It retains much of its shape, draping over the sphere with minimal deformation. The cloth appears stiffer and holds its form, resembling a denser or more rigid material that resists deformation from gravity, characterized by shallower folds and a smoother appearance over the sphere.
+    </p>
+
+
+
+    <div align="middle">
+        <img src="images/part3d.png" align="middle" width="100%" />
+    </div>
+
+
+
+    <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-4">
+        <h2 align="middle">Part 4: Handling self-collisions</h2>
+    </a>
+
+
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part4a.png" align="middle" width="300vw" />
+                    <figcaption>Self collision 1</figcaption>
+                </td>
+                <td>
+                    <img src="images/part4b.png" align="middle" width="300vw" />
+                    <figcaption>Self collision 2</figcaption>
+                </td>
+                <td>
+                    <img src="images/part4c.png" align="middle" width="300vw" />
+                    <figcaption>Self collision 3</figcaption>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part4d.png" align="middle" width="400px" />
+                    <figcaption>$\text{density} = 1$</figcaption>
+
+                </td>
+                <td>
+                    <img src="images/part4e.png" align="middle" width="400px" />
+                    <figcaption>$\text{density} = 50$</figcaption>
+                </td>
+            </tr>
+            <tr align="center">
+                <td>
+                    <img src="images/part4f.png" align="middle" width="400px" />
+                    <figcaption>$\text{ks} = 1,000$</figcaption>
+                </td>
+                <td>
+                    <img src="images/part4g.png" align="middle" width="400px" />
+                    <figcaption>$\text{ks} = 7,500$</figcaption>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <p>
+        Case 1: Density  = 1 (Low Density)
+        </br>
+        Behavior: With low density, the cloth  falls more slowly and is greatly affected by air resistance and its own inertia.
+        As it falls onto itself, it billows and creates a larger, softer folds.
+        </br>
+        </br>
+        Case 2: Density = 50 (High Density)
+        </br>
+        Behavior: A high-density cloth falls more quickly due to its weight.
+        It results in a less apparent billowing and tighter form, smaller folds as it collapses onto itself, looking more compact and heavy.
+        </br>
+        </br>
+        Case 3: Spring Constant (ks) = 1000 (Lower Stiffness)
+        </br>
+        Behavior: A lower spring constant means the cloth appears to be more elastic and stretchy. 
+        It forms deeper, more pronounced folds as it falls onto itself due to the springs allow for greater extension.
+        </br>
+        </br>
+        Case 4: Spring Constant (ks) = 7500 (Higher Stiffness)
+        </br>
+        Behavior: With a higher ks, the cloth is resisting stretching and deformation. 
+        It should appear stiffer and maintain more of its initial volume as it falls onto itself, resulting in less pronounced folding.
+    </p>
+
+
+
+    <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-5">
+        <h2 align="middle">Part 5: Cloth Sim</h2>
+    </a>
+
+
+
+    <p>
+
+        The shader program is used to control the rendering of shapes and colors on the screen. The vertex shader manipulates the shape by adjusting the position and properties of each vertex, transforming 3D models into a 2D projection, while the fragment shader adds color and texture to the shapes, creating detailed visual effects like lighting and shadow. Together, they process the 3D data and determine how it appears in the final image, allowing for the creation of complex and realistic scenes in real-time graphics.
+    </p>
+
+
+
+    <p>
+        The Blinn-Phong model adds a specular highlight to the object,
+        which is the bright spot of light that appears where the viewer can see the reflection of the light source.
+        This specular component is calculated based on the angle between the viewer's line of sight and the reflection
+        direction of the light off the surface. The model uses an exponent called the shininess coefficient to control the size
+        and intensity of the specular highlight—the higher the coefficient, the smaller and sharper the highlight. This makes the
+        Blinn-Phong model particularly good at representing materials like plastic or metal which have distinct specular reflections.
+    </p>
+
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part5a.png" align="middle" width="400px" />
+                    <figcaption>Ambient component only</figcaption>
+
+                </td>
+                <td>
+                    <img src="images/part5b.png" align="middle" width="400px" />
+                    <figcaption>Diffuse component only</figcaption>
+                </td>
+            </tr>
+            <tr align="center">
+                <td>
+                    <img src="images/part5c.png" align="middle" width="400px" />
+                    <figcaption>Specular component only</figcaption>
+                </td>
+                <td>
+                    <img src="images/part5d.png" align="middle" width="400px" />
+                    <figcaption>Complete Blinn-Phong model</figcaption>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div align="middle">
+        <img src="images/part5e.png" align="middle" width="100%" />
+    </div>
+
+
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part5f.png" align="middle" width="400vw" />
+                    <figcaption>Bump Mapping on the Cloth</figcaption>
+                </td>
+                <td>
+                    <img src="images/part5g.png" align="middle" width="400vw" />
+                    <figcaption>Bump Mapping on the Sphere</figcaption>
+                </td>
+                <td>
+                </td>
+            </tr>
+            <tr align="center">
+                <td>
+                    <img src="images/part5h.png" align="middle" width="400vw" />
+                    <figcaption>Displacement Mapping on the Sphere</figcaption>
+                </td>
+                <td>
+                    <img src="images/part5i.png" align="middle" width="400vw" />
+                    <figcaption>Displacement Mapping on the Sphere (coarser mesh)</figcaption>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <p>
+
+        In the screenshots showcasing bump and displacement mapping on both cloth and sphere surfaces, we can observe the contrasting effects each technique has on the texture details. Bump mapping gives the illusion of depth and complexity without altering the geometry of the surface, hence why the cloth and sphere retain their original shape while exhibiting textured shadows and highlights. 
+        </br>
+        </br>
+        Displacement mapping, conversely, actually modifies the mesh geometry, creating tangible relief with the texture details. This results in a more realistic representation, as seen on the sphere where the texture is not just a visual effect but has become part of the sphere's structure. This can lead to a more convincing representation of complex surfaces, especially when the light interacts with the altered shapes, casting shadows and creating highlights that correspond to the true physical form.  
+        </br>
+        </br>
+        Adjusting the sphere's mesh coarseness significantly affects the displacement mapping results. With a finer mesh (e.g., using -16 or -128), the details are more pronounced and smoother, while a coarser mesh (e.g., using -0 or -16) might not capture all the nuances of the texture, leading to a rougher and less detailed appearance. The bump mapping remains unaffected by mesh coarseness since it doesn't alter the mesh but only simulates the lighting effects on a surface texture.
+    </p>
+
+
+
+
+    <div align="middle">
+        <table style="width:100%">
+            <tr align="center">
+                <td>
+                    <img src="images/part5j.png" align="middle" width="400vw" />
+                    <figcaption>Mirror Shader on the Cloth</figcaption>
+                </td>
+                <td>
+                    <img src="images/part5k.png" align="middle" width="400vw" />
+                    <figcaption>Mirror Shader on the Sphere</figcaption>
+                </td>
+                <td>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+</body>
 </html>
